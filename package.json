@@ -9,7 +9,8 @@
     "export": "nuxt-ts export",
     "serve": "nuxt-ts serve",
     "lint:js": "eslint --ext .js,.vue --ignore-path .gitignore .",
-    "lint": "yarn lint:js"
+    "lint": "yarn lint:js",
+    "generate": "nuxt generate"
   },
   "dependencies": {
     "@nuxt/typescript-runtime": "^0.4.10",
@@ -19,10 +20,12 @@
     "nuxt": "^2.13.0"
   },
   "devDependencies": {
+    "@mdi/font": "^5.4.55",
     "@nuxt/typescript-build": "^1.0.3",
     "@nuxtjs/eslint-config": "^3.0.0",
     "@nuxtjs/eslint-config-typescript": "^2.0.0",
     "@nuxtjs/eslint-module": "^2.0.0",
+    "@nuxtjs/vuetify": "^1.11.2",
     "babel-eslint": "^10.1.0",
     "eslint": "^7.2.0",
     "eslint-plugin-nuxt": "^1.0.0"
