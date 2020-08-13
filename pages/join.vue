@@ -5,14 +5,25 @@
                 <v-card class="elevation-12">
                     <v-toolbar dark color="primary">
                         <v-toolbar-title>
-                          Login
+                          Join
                         </v-toolbar-title>
                     </v-toolbar>
                     <v-card-text>
-                        <v-form ref="formLogin" v-model="valid">
+                        <v-form ref="formJoin"
+                          v-model="valid"
+                          lazy-validation
+                        >
+                             <v-text-field
+                              prepend-icon="mdi-cow"
+                              v-model="displayName"
+                              :counter="30"
+                              :rules="displayNameRules"
+                              label="Display Name"
+                              required
+                            ></v-text-field>
                             <v-text-field
                                 prepend-icon="mdi-account"
-                                name="emailLogin"
+                                name="emailJoin"
                                 label="Email"
                                 type="email"
                                 v-model="email"
@@ -22,12 +33,12 @@
                             </v-text-field>
                             <v-text-field
                                 prepend-icon="mdi-lock"
-                                name="passwordLogin"
+                                name="passwordJoin"
                                 label="Password"
                                 type="password"
+                                required
                                 v-model="password"
                                 :rules="passwordRules"
-                                required
                             >
                             </v-text-field>
                         </v-form>
@@ -35,21 +46,18 @@
                     <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn
-                          color="yellow"
-                          to="/join"
-                        >Join</v-btn>
-                        <v-btn
                           color="primary"
-                          :disabled="!valid"
-                          @click="submit"
-                        >Login</v-btn>
+                          to="/login"
+                          >To Login</v-btn
+                        >
+                        <v-btn
+                            color="yellow"
+                            :disabled="!valid"
+                            @click="submit"
+                            >Join</v-btn
+                        >
                     </v-card-actions>
                 </v-card>
-            <!-- <p>You don't have an account
-              ? You can <router-link
-              to="/join">
-            create one
-            </router-link></p> -->
             </v-flex>
         </v-layout>
     </v-container>
@@ -60,12 +68,18 @@ import Vue from 'vue'
 import { mapActions } from 'vuex'
 
 export default Vue.extend({
-  name: 'Signin',
+  name: 'Join',
   data() {
     return {
       valid: false,
+      displayName: '',
       email: '',
       password: '',
+      displayNameRules: [
+        (v: string) => !!v || 'Name is required',
+        (v: string) => (v && v.length <= 30)
+          || 'Name must be less than 30 characters',
+      ],
       emailRules: [
         (v: string) => !!v || 'E-mail is required',
         (v: string) => /.+@.+/.test(v)
@@ -80,35 +94,28 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions({
-        login: 'user/login'
+        userJoin: 'user/userJoin'
     }),
     async submit() {
-      if (this.formLogin.validate()) {
+      if (this.formJoin.validate()) {
         try {
-        //   await this.login(
-        //     this.email,
-        //     this.password,
-        //   )
-        await this.login({
-            email: this.email,
-            password: this.password
-        })
+          await this.userJoin({
+              email: this.email,
+              password: this.password,
+              displayName: this.displayName,
+          })
+          this.$toasted.global.my_app_success()
         } catch (error) {
-          this.$toast.global.my_app_error(error)
-          console.log('error In Login: ', error)
-          this.formLogin.reset()
+          this.$toasted.global.my_app_error(error)
+          console.log('error In Join: ', error)
         }
       }
     },
   },
   computed: {
-    formLogin(): Vue & {
-      validate: () => boolean;
-      reset: () => void;
-      } {
-      return this.$refs.formLogin as Vue & {
+    formJoin(): Vue & { validate: () => boolean } {
+      return this.$refs.formJoin as Vue & {
         validate: () => boolean;
-        reset: () => void;
        }
     },
   },

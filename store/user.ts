@@ -10,18 +10,40 @@ export const mutations = {
     state.user = user
   }
 }
+
+export const getters: GetterTree<UserStateType, UserStateType> = {
+  isAuthenticated: state => !!state.user
+}
   
 export const actions: ActionTree<UserStateType, UserStateType> = {
   async login ({commit}, payload: {
     email: string,
-    pass: string
+    password: string
   }) {
-    const { email, pass } = payload
-    const userCre = await auth.signInWithEmailAndPassword(email, pass)
+    const { email, password } = payload
+    console.log('email', email)
+    console.log('pass', password)
+    const userCre = await auth.signInWithEmailAndPassword(email, password)
     commit('setUser', userCre.user)
+  },
+  
+   async userJoin ({commit}, payload: {
+    email: string,
+    password: string,
+    displayName: string,
+   }) {
+    const { email, password, displayName } = payload
+    const data = await auth
+      .createUserWithEmailAndPassword(email, password)
+    const { user } = data
+    await user?.updateProfile({
+      displayName,
+    })
+    commit('setUser', user)
+    // TODO add user doc to firestore
+    // await userDoc().withConverter(userConverter).set({
+    //   email,
+    //   displayName,
+    // })
   }
-}
-
-export const getters: GetterTree<UserStateType, UserStateType> = {
-  isAuthenticated: state => !!state.user
 }

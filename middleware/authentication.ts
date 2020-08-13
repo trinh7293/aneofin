@@ -1,11 +1,19 @@
 import { Middleware } from '@nuxt/types'
 
 const myMiddleware: Middleware = ({ store, route, redirect }) => {
-  console.log('store.getters', store.getters['user/isAuthenticated'])
-    if (!store.getters['user/isAuthenticated'] && route.name !== 'login') {
+  const unRequireAuths = ['login', 'join']
+    if (
+        !store.getters['user/isAuthenticated']
+        && route.name
+        && !unRequireAuths.includes(route.name)
+      ) {
       redirect('/login')
     }
-    if (store.getters['user/isAuthenticated'] && route.name === 'login') {
+    if (
+        store.getters['user/isAuthenticated']
+        && route.name
+        && unRequireAuths.includes(route.name)
+      ) {
       redirect('/')
     }
   }
