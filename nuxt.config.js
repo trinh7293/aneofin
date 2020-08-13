@@ -35,8 +35,13 @@ export default {
   ** https://nuxtjs.org/guide/plugins
   */
   plugins: [
-    '@plugins/vuetify'
+    '@plugins/vuetify',
+    '@plugins/fireauth',
   ],
+  // ...
+  router: {
+    middleware: 'authentication'
+  },
   /*
   ** Auto import components
   ** See https://nuxtjs.org/api/configuration-components
@@ -56,6 +61,8 @@ export default {
     'bootstrap-vue/nuxt',
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
+    // https://github.com/nuxt-community/modules/tree/master/packages/toast
+    '@nuxtjs/toast',
   ],
   /*
   ** Axios module configuration
@@ -66,6 +73,43 @@ export default {
   ** Build configuration
   ** See https://nuxtjs.org/api/configuration-build/
   */
+  toast: {
+    position: 'top-right',
+    theme: 'bubble',
+    duration: 5000,
+    register: [ // Register custom toasts
+      {
+        name: 'my_app_error',
+        message: payload => {
+          // if there is no message passed show default message
+          if (!payload.message) {
+            return 'Oops.. Something Went Wrong..'
+          }
+      
+          // if there is a message show it with the message
+          return `Oops.. ${payload.message}`
+        },
+        options: {
+          type: 'error'
+        }
+      },
+      {
+        name: 'my_app_success',
+        message: payload => {
+          // if there is no message passed show default message
+          if (!payload.message) {
+            return 'Success'
+          }
+      
+          // if there is a message show it with the message
+          return `${payload.message}`
+        },
+        options: {
+          type: 'success'
+        }
+      }
+    ]
+  },
   build: {
   }
 }
