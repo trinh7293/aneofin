@@ -6,13 +6,13 @@ interface RootStateType {
 }
 
 interface UserStateType {
-  user: firebase.UserInfo | null;
+  user: UserType | null;
 }
 
 interface UserType {
-  email: string;
-  displayName: string;
-  uid: number;
+  email: string | null;
+  displayName: string | null;
+  uid: string;
 }
 
 interface ItemType {

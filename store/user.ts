@@ -6,7 +6,7 @@ export const state = () => ({
 })
 
 export const mutations = {
-  setUser(state: UserStateType, user: firebase.User | null) {
+  setUser(state: UserStateType, user: UserType) {
     state.user = user
   }
 }

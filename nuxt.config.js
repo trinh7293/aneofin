@@ -4,7 +4,7 @@ export default {
   ** Nuxt rendering mode
   ** See https://nuxtjs.org/api/configuration-mode
   */
-  mode: 'universal',
+  mode: 'spa',
   /*
   ** Nuxt target
   ** See https://nuxtjs.org/api/configuration-target
@@ -85,7 +85,7 @@ export default {
           if (!payload.message) {
             return 'Oops.. Something Went Wrong..'
           }
-      
+
           // if there is a message show it with the message
           return `Oops.. ${payload.message}`
         },
@@ -100,7 +100,7 @@ export default {
           if (!payload.message) {
             return 'Success'
           }
-      
+
           // if there is a message show it with the message
           return `${payload.message}`
         },
