@@ -2,8 +2,17 @@ interface ItemStore {
   listItem: Array<ItemType>;
 }
 
+interface RootStateType {
+}
+
 interface UserStateType {
-  user: firebase.User | null;
+  user: firebase.UserInfo | null;
+}
+
+interface UserType {
+  email: string;
+  displayName: string;
+  uid: number;
 }
 
 interface ItemType {

@@ -2,21 +2,21 @@ import { GetterTree, ActionTree, MutationTree } from 'vuex'
 import { auth } from '@/services/fireinit'
 
 export const state = () => ({
-  user: null
+  user: null,
 })
-  
+
 export const mutations = {
-  setUser (state: UserStateType, user : firebase.User | null) {
+  setUser(state: UserStateType, user: firebase.User | null) {
     state.user = user
   }
 }
 
-export const getters: GetterTree<UserStateType, UserStateType> = {
+export const getters: GetterTree<UserStateType, RootStateType> = {
   isAuthenticated: state => !!state.user
 }
-  
-export const actions: ActionTree<UserStateType, UserStateType> = {
-  async login ({commit}, payload: {
+
+export const actions: ActionTree<UserStateType, RootStateType> = {
+  async login({ commit }, payload: {
     email: string,
     password: string
   }) {
@@ -24,14 +24,14 @@ export const actions: ActionTree<UserStateType, UserStateType> = {
     console.log('email', email)
     console.log('pass', password)
     const userCre = await auth.signInWithEmailAndPassword(email, password)
-    commit('setUser', userCre.user)
+    // commit('setUser', userCre.user)
   },
-  
-   async userJoin ({commit}, payload: {
+
+  async userJoin({ commit }, payload: {
     email: string,
     password: string,
     displayName: string,
-   }) {
+  }) {
     const { email, password, displayName } = payload
     const data = await auth
       .createUserWithEmailAndPassword(email, password)
@@ -39,7 +39,7 @@ export const actions: ActionTree<UserStateType, UserStateType> = {
     await user?.updateProfile({
       displayName,
     })
-    commit('setUser', user)
+    // commit('setUser', user)
     // TODO add user doc to firestore
     // await userDoc().withConverter(userConverter).set({
     //   email,
