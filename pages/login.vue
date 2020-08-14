@@ -50,7 +50,7 @@
 
 <script lang='ts'>
 import Vue from 'vue'
-import { mapActions } from 'vuex'
+import { auth } from '@/services/fireinit'
 
 export default Vue.extend({
   name: 'Signin',
@@ -82,16 +82,12 @@ export default Vue.extend({
     }
   },
   methods: {
-    ...mapActions({
-      login: 'user/login'
-    }),
     async submit () {
       if (this.formLogin.validate()) {
         try {
-          await this.login({
-            email: this.email,
-            password: this.password
-          })
+          await auth.signInWithEmailAndPassword(this.email, this.password)
+          this.$toast.global.my_app_success()
+          this.$router.push('/')
         } catch (error) {
           this.$toast.global.my_app_error(error)
           this.formLogin.reset()

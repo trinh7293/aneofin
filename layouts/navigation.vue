@@ -21,6 +21,12 @@
           <span>{{ tab.title }}</span>
           <v-icon>{{ tab.icon }}</v-icon>
         </v-btn>
+        <v-btn
+          @click="submitSignout"
+        >
+          <span>Log out</span>
+          <v-icon>mdi-logout</v-icon>
+        </v-btn>
       </v-bottom-navigation>
     </main>
   </v-app>
@@ -28,6 +34,8 @@
 
 <script lang='ts'>
 import Vue from 'vue'
+import { mapMutations } from 'vuex'
+import { auth } from '~/services/fireinit'
 
 const tabs = [
   {
@@ -53,8 +61,20 @@ export default Vue.extend({
     currentTab: tabs[0]
   }),
   methods: {
+    ...mapMutations({
+      setUser: 'user/setUser'
+    }),
     changeRoute (path: string) {
       this.$router.push(path)
+    },
+    async submitSignout () {
+      try {
+        await auth.signOut()
+        this.setUser(null)
+        this.$router.push('/login')
+      } catch (error) {
+        this.$toasted.global.my_app_error(error)
+      }
     }
   }
 })

@@ -66,7 +66,7 @@
 
 <script lang='ts'>
 import Vue from 'vue'
-import { mapActions } from 'vuex'
+import { auth } from '@/services/fireinit'
 
 export default Vue.extend({
   name: 'Join',
@@ -101,18 +101,17 @@ export default Vue.extend({
     }
   },
   methods: {
-    ...mapActions({
-      userJoin: 'user/userJoin'
-    }),
     async submit () {
       if (this.formJoin.validate()) {
         try {
-          await this.userJoin({
-            email: this.email,
-            password: this.password,
+          const data = await auth
+            .createUserWithEmailAndPassword(this.email, this.password)
+          const { user } = data
+          await user?.updateProfile({
             displayName: this.displayName
           })
-          this.$toasted.global.my_app_success()
+          this.$toast.global.my_app_success()
+          this.$router.push('/')
         } catch (error) {
           this.$toasted.global.my_app_error(error)
         }
