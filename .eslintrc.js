@@ -12,6 +12,7 @@ module.exports = {
   ],
   // add your custom rules here
   rules: {
-    semi: 'error'
+    semi: 'error',
+    'max-len': ['error', { code: 80 }]
   }
 }

@@ -1,5 +1,4 @@
 import { GetterTree } from 'vuex'
-import { auth } from '@/services/fireinit'
 
 export const state = () => ({
   user: null
