@@ -132,48 +132,53 @@
   </main>
 </template>
 
-<script lang='ts'>
-import Vue from 'vue'
+<script lang="ts">
+import { Vue, Component, Watch } from 'vue-property-decorator'
 
-export default Vue.extend({
-  layout: 'navigation',
-  data: () => ({
-    dialog: false,
-    dialogDelete: false,
-    headers: [
+@Component({
+  layout: 'navigation'
+})
+export default class EditProduct extends Vue {
+    private dialog = false
+    private dialogDelete = false
+    private headers = [
       { text: 'Name', value: 'name' },
       { text: 'Cost', value: 'cost' }
-    ],
-    valid: false,
-    nameRules: [
+    ]
+
+    private valid = false
+    private nameRules = [
       (v: string) => !!v || 'Name is required',
       (v: string) => (v && v.length <= 20) ||
         'Name must be less than 20 characters'
-    ],
-    costRules: [
+    ]
+
+    private costRules = [
       (v: number) => !!v || 'Cost is required',
       (v: number) => (v && v > 1000 && v < 50000000) ||
         'Cost must be greater than 1000 and less than 50000000'
-    ],
-    editedIndex: '',
-    editedItem: {
-      name: '',
-      cost: 0
-    },
-    defaultItem: {
+    ]
+
+    private editedIndex = ''
+    private editedItem = {
       name: '',
       cost: 0
     }
-  }),
 
-  computed: {
-    listItem () {
+    private defaultItem = {
+      name: '',
+      cost: 0
+    }
+
+    get listItem () {
       return this.$store.state.items.listItem
-    },
-    checkItemEdited () {
+    }
+
+    get checkItemEdited () {
       return this.editedIndex !== ''
-    },
-    form (): Vue & {
+    }
+
+    get form (): Vue & {
       validate: () => boolean;
       reset: () => void;
       } {
@@ -182,36 +187,36 @@ export default Vue.extend({
         reset: () => void;
        }
     }
-  },
 
-  watch: {
-    dialog (val: boolean) {
+    @Watch('dialog')
+    dialogChanged (val: boolean) {
       if (!val) {
         this.close()
       }
     }
-  },
 
-  methods: {
     editItem (item: ItemType) {
       this.editedIndex = this.listItem.indexOf(item)
       this.editedItem = { ...item }
       this.dialog = true
-    },
-    deleteItem () {
+    }
+
+    public deleteItem () {
       this.$store.commit('items/remove', { ...this.editedItem })
       this.dialogDelete = false
       this.close()
-    },
-    close () {
+    }
+
+    public close () {
       this.dialog = false
       this.form.reset()
       setTimeout(() => {
         this.editedItem = { ...this.defaultItem }
         this.editedIndex = ''
       }, 300)
-    },
-    submit () {
+    }
+
+    public submit () {
       if (this.form.validate()) {
         if (this.editedIndex !== '') {
           this.$store.commit('items/edit', { ...this.editedItem })
@@ -221,6 +226,6 @@ export default Vue.extend({
         this.close()
       }
     }
-  }
-})
+}
+
 </script>

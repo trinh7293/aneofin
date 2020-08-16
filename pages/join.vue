@@ -66,7 +66,8 @@
 
 <script lang='ts'>
 import Vue from 'vue'
-import { auth } from '@/services/fireinit'
+import { auth, firestore } from '@/services/fireinit'
+import { USER_COLLECTION } from '@/constants'
 
 export default Vue.extend({
   name: 'Join',
@@ -104,16 +105,23 @@ export default Vue.extend({
     async submit () {
       if (this.formJoin.validate()) {
         try {
+          const { email, password, displayName } = this
           const data = await auth
-            .createUserWithEmailAndPassword(this.email, this.password)
+            .createUserWithEmailAndPassword(email, password)
           const { user } = data
           await user?.updateProfile({
-            displayName: this.displayName
+            displayName
           })
+          firestore.collection(USER_COLLECTION)
+            .doc(this.$store.getters['user/uid'])
+            .set({
+              email,
+              displayName
+            })
           this.$toast.global.my_app_success()
           this.$router.push('/')
         } catch (error) {
-          this.$toasted.global.my_app_error(error)
+          this.$toast.global.my_app_error(error)
         }
       }
     }

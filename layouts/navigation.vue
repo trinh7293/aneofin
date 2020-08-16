@@ -81,7 +81,7 @@ export default class Navigation extends Vue {
       this.$store.commit('user/setUser', null)
       this.$router.push('/login')
     } catch (error) {
-      this.$toasted.global.my_app_error(error)
+      this.$toast.global.my_app_error(error)
     }
   }
 }
