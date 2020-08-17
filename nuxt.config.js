@@ -111,6 +111,21 @@ export default {
         options: {
           type: 'success'
         }
+      },
+      {
+        name: 'my_app_info',
+        message: (payload) => {
+          // if there is no message passed show default message
+          if (!payload.message) {
+            return 'OK'
+          }
+
+          // if there is a message show it with the message
+          return `${payload.message}`
+        },
+        options: {
+          type: 'info'
+        }
       }
     ]
   },

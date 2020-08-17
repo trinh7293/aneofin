@@ -1,21 +1,35 @@
-interface ItemStore {
-  listItem: Array<ItemType>;
-}
-
 interface RootStateType {
 }
 
+interface ProductStateType {
+  listProduct: Array<ProductType>
+}
+
 interface UserStateType {
-  user: UserType | null;
+  user: UserType | null
 }
 
 interface UserType {
-  email: string | null;
-  displayName: string | null;
-  uid: string;
+  email: string | null
+  displayName: string | null
+  uid: string
 }
 
-interface ItemType {
+interface ProductType {
+  id: string
   name: string
-  cost: number;
+  cost: number
+}
+
+interface OrderType {
+  id: string
+  createdDate: Date
+}
+
+interface OrderDetailType {
+  id?: string
+  name?: string
+  cost?: number
+  productId: string
+  quantity: number
 }

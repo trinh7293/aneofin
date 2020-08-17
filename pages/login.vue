@@ -50,7 +50,7 @@
 
 <script lang='ts'>
 import Vue from 'vue'
-import { auth } from '@/services/fireinit'
+import { userLogin } from '@/services/userApi'
 
 export default Vue.extend({
   name: 'Signin',
@@ -85,7 +85,7 @@ export default Vue.extend({
     async submit () {
       if (this.formLogin.validate()) {
         try {
-          await auth.signInWithEmailAndPassword(this.email, this.password)
+          await userLogin(this.email, this.password)
           this.$toast.global.my_app_success()
           this.$router.push('/')
         } catch (error) {

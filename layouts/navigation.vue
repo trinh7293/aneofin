@@ -58,7 +58,7 @@ export default class Navigation extends Vue {
     {
       title: 'Quản lý mặt hàng',
       icon: 'mdi-star',
-      path: '/items/edit'
+      path: '/products/edit'
     },
     {
       title: 'Kho',

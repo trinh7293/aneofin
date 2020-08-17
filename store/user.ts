@@ -11,6 +11,5 @@ export const mutations = {
 }
 
 export const getters: GetterTree<UserStateType, RootStateType> = {
-  isAuthenticated: state => !!state.user,
-  uid: state => state.user?.uid
+  isAuthenticated: state => !!state.user
 }

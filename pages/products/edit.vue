@@ -1,10 +1,10 @@
 <template>
-  <main>
+  <v-container>
     <v-data-table
       :headers="headers"
-      :items="listItem"
+      :items="listProduct"
       class="elevation-1"
-      @click:row="editItem"
+      @click:row="openEditProductPopup"
     >
       <template v-slot:top>
         <v-toolbar flat color="white">
@@ -34,7 +34,7 @@
                   </span>
                   <v-spacer />
                   <v-icon
-                    v-show="checkItemEdited"
+                    v-show="checkProductEdited"
                     color="red"
                     @click="dialogDelete = true"
                   >
@@ -47,7 +47,7 @@
                     <v-row>
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
-                          v-model="editedItem.name"
+                          v-model="editedProduct.name"
                           required
                           prepend-icon="mdi-star"
                           :rules="nameRules"
@@ -56,7 +56,7 @@
                       </v-col>
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
-                          v-model="editedItem.cost"
+                          v-model="editedProduct.cost"
                           required
                           prepend-icon="mdi-cow"
                           :rules="costRules"
@@ -98,7 +98,7 @@
         <v-card-title
           class="headline"
         >
-          Confirm delete item
+          Confirm delete product
         </v-card-title>
 
         <v-card-text>
@@ -119,7 +119,7 @@
           <v-btn
             color="green darken-1"
             text
-            @click="deleteItem"
+            @click="deleteProduct"
           >
             Delete
           </v-btn>
@@ -127,16 +127,20 @@
       </v-card>
     </v-dialog>
     <p>
-      Click to item to edit
+      Click to product to edit
     </p>
-  </main>
+  </v-container>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator'
+import {
+  addProduct, editProduct, deleteProduct, getProducts
+} from '@/services/productsApi'
 
 @Component({
-  layout: 'navigation'
+  layout: 'navigation',
+  middleware: ['fetchProducts']
 })
 export default class EditProduct extends Vue {
     private dialog = false
@@ -160,21 +164,23 @@ export default class EditProduct extends Vue {
     ]
 
     private editedIndex = ''
-    private editedItem = {
+    private editedProduct = {
+      id: '',
       name: '',
       cost: 0
     }
 
-    private defaultItem = {
+    private defaultProduct = {
+      id: '',
       name: '',
       cost: 0
     }
 
-    get listItem () {
-      return this.$store.state.items.listItem
+    get listProduct () {
+      return this.$store.state.products.listProduct
     }
 
-    get checkItemEdited () {
+    get checkProductEdited () {
       return this.editedIndex !== ''
     }
 
@@ -195,14 +201,24 @@ export default class EditProduct extends Vue {
       }
     }
 
-    editItem (item: ItemType) {
-      this.editedIndex = this.listItem.indexOf(item)
-      this.editedItem = { ...item }
+    openEditProductPopup (
+      item: ProductType
+    ) {
+      this.editedIndex = item.id
+      this.editedProduct = { ...item }
       this.dialog = true
     }
 
-    public deleteItem () {
-      this.$store.commit('items/remove', { ...this.editedItem })
+    public async deleteProduct () {
+      try {
+        await deleteProduct(this.editedProduct.id)
+        await getProducts()
+        this.$toast.global.my_app_success(
+          'product deleted'
+        )
+      } catch (error) {
+        this.$toast.global.my_app_error(error)
+      }
       this.dialogDelete = false
       this.close()
     }
@@ -211,17 +227,30 @@ export default class EditProduct extends Vue {
       this.dialog = false
       this.form.reset()
       setTimeout(() => {
-        this.editedItem = { ...this.defaultItem }
+        this.editedProduct = { ...this.defaultProduct }
         this.editedIndex = ''
       }, 300)
     }
 
-    public submit () {
+    public async submit () {
       if (this.form.validate()) {
-        if (this.editedIndex !== '') {
-          this.$store.commit('items/edit', { ...this.editedItem })
-        } else {
-          this.$store.commit('items/add', { ...this.editedItem })
+        try {
+          if (this.editedIndex !== '') {
+            await editProduct(this.editedProduct)
+            this.$toast.global.my_app_success(
+              'product successfully created'
+            )
+          } else {
+            await addProduct(this.editedProduct)
+            this.$toast.global.my_app_success(
+              'product successfully created'
+            )
+          }
+          await getProducts()
+        } catch (error) {
+          this.$toast.global.my_app_error(
+            error
+          )
         }
         this.close()
       }

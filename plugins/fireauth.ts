@@ -7,7 +7,8 @@ const myPlugin: Plugin = (context) => {
   return new Promise((resolve) => {
     auth.onAuthStateChanged((user) => {
       if (user) {
-        return resolve(store.commit('user/setUser', buildUser(user)))
+        store.commit('user/setUser', buildUser(user))
+        return resolve()
       }
       return resolve()
     })
