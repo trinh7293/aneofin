@@ -23,9 +23,17 @@
         >
           <template slot="body.append">
             <tr>
-              <td />
               <td>Total: {{ totalCost }}</td>
-              <td />
+              <td>
+                <v-btn
+                  color="primary"
+                  :disabled="listOrderDetail.length < 1"
+                  :loading="payLoading"
+                  @click="addPayingTransactionImpl"
+                >
+                  Pay
+                </v-btn>
+              </td>
             </tr>
           </template>
         </v-data-table>
@@ -37,6 +45,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import { getProducts } from '@/services/productsApi'
+import { addPayingTransaction } from '@/services/oderApi'
 
 @Component({
   layout: 'navigation'
@@ -44,6 +53,7 @@ import { getProducts } from '@/services/productsApi'
 export default class Order extends Vue {
   private products: Array<ProductType> = []
   private loading: boolean = false
+  private payLoading: boolean = false
 
   private headersProductList = [
     { text: 'Name', value: 'name' },
@@ -56,6 +66,23 @@ export default class Order extends Vue {
   ]
 
   private listOrderDetail: Array<OrderDetailType> = []
+
+  public addPayingTransactionImpl = async () => {
+    if (this.payLoading) {
+      return
+    }
+    try {
+      this.payLoading = true
+      const orderId = await addPayingTransaction(this.listOrderDetail)
+      this.$toast.global.my_app_success({
+        message: `Successfully Pay for Order ID ${orderId}`
+      })
+      this.listOrderDetail.splice(0, this.listOrderDetail.length)
+    } catch (error) {
+      this.$toast.global.my_app_error(error)
+    }
+    this.payLoading = false
+  }
 
   public start () {
     this.loading = true

@@ -1,11 +1,24 @@
-import { ORDER_SUBCOLLECTION, USER_COLLECTION } from '@/constants'
+import {
+  USER_COLLECTION,
+  ORDER_SUBCOLLECTION,
+  ORDER_DETAIL_SUBCOLLECTION
+} from '@/constants'
 import { firestore, auth } from '@/services/fireinit'
 // import OrderConverter from '@/services/converters/OrderConverter'
 
-const ordersCol = () => {
+const userDoc = () => {
   return firestore.collection(USER_COLLECTION)
     .doc(auth.currentUser?.uid)
+}
+
+const ordersCol = () => {
+  return userDoc()
     .collection(ORDER_SUBCOLLECTION)
+}
+
+const orderDetailCol = () => {
+  return userDoc()
+    .collection(ORDER_DETAIL_SUBCOLLECTION)
 }
 
 export const getOrders = async () => {
@@ -25,28 +38,23 @@ export const getOrders = async () => {
   return listOrder
 }
 
-// TODO add order and orderDetail in transaction
-
-// export const addOrder = async () => {
-//   const order = await ordersCol()
-//     .withConverter(OrderConverter).add({
-//       createdDate: new Date()
-//     })
-//   return order.id
-// }
-
-// export const editProduct = async (
-//   product: ProductType
-// ) => {
-//   const { name, cost } = product
-//   const editData = {
-//     name,
-//     cost
-//   }
-//   await productsCol().withConverter(productConverter)
-//     .doc(product.id).set(editData)
-// }
-
-// export const deleteProduct = (productId: string) => {
-//   return productsCol().doc(productId).delete()
-// }
+// add order and orderDetail in batch
+export const addPayingTransaction = async (
+  listOrderDetail: Array<OrderDetailType>
+) => {
+  const batch = firestore.batch()
+  const orderRef = ordersCol().doc()
+  batch.set(orderRef, {
+    createdDate: new Date()
+  })
+  listOrderDetail.forEach((odDe) => {
+    const OrDeRef = orderDetailCol().doc()
+    batch.set(OrDeRef, {
+      orderId: orderRef.id,
+      productId: odDe.productId,
+      quantity: odDe.quantity
+    })
+  })
+  await batch.commit()
+  return orderRef.id
+}

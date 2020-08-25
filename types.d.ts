@@ -30,6 +30,7 @@ interface OrderDetailType {
   id?: string
   name?: string
   cost?: number
+  orderId?: string
   productId: string
   quantity: number
 }
