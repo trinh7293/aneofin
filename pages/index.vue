@@ -24,19 +24,18 @@
           <template slot="body.append">
             <tr>
               <td>Total: {{ totalCost }}</td>
-              <td>
-                <v-btn
-                  color="primary"
-                  :disabled="listOrderDetail.length < 1"
-                  :loading="payLoading"
-                  @click="addPayingTransactionImpl"
-                >
-                  Pay
-                </v-btn>
-              </td>
+              <td />
             </tr>
           </template>
         </v-data-table>
+        <v-btn
+          color="primary"
+          :disabled="listOrderDetail.length < 1"
+          :loading="payLoading"
+          @click="addPayingTransactionImpl"
+        >
+          Pay
+        </v-btn>
       </v-col>
     </v-row>
   </v-container>
@@ -44,6 +43,7 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
+import _ from 'lodash'
 import { getProducts } from '@/services/productsApi'
 import { addPayingTransaction } from '@/services/oderApi'
 
@@ -67,7 +67,7 @@ export default class Order extends Vue {
 
   private listOrderDetail: Array<OrderDetailType> = []
 
-  public addPayingTransactionImpl = async () => {
+  public async addPayingTransactionImpl () {
     if (this.payLoading) {
       return
     }
@@ -129,12 +129,7 @@ export default class Order extends Vue {
   }
 
   get totalCost () {
-    let total = 0
-    this.listOrderDetail.forEach((item) => {
-      const itemToCost: number = item.cost ? (item.quantity * item.cost) : 0
-      total += itemToCost
-    })
-    return total
+    return _.sumBy(this.listOrderDetail, i => (i.cost || 0) * i.quantity)
   }
 }
 </script>

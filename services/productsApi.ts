@@ -30,25 +30,25 @@ export const getProducts = async () => {
 }
 
 export const addProduct = async (
-  productData: ProductType
+  product: ProductType
 ) => {
-  const { name, cost } = productData
+  const { name, cost } = product
   await productsCol()
     .withConverter(productConverter).add({
       name,
-      cost
+      cost: Number(cost)
     })
 }
 
 export const editProduct = (
   product: ProductType
 ) => {
-  const editData = _.pick(product,
-    'name',
-    'cost'
-  )
+  const { name, cost } = product
   return productsCol().withConverter(productConverter)
-    .doc(product.id).set(editData)
+    .doc(product.id).set({
+      name,
+      cost: Number(cost)
+    })
 }
 
 export const deleteProduct = (productId: string) => {
