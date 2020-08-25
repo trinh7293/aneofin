@@ -2,8 +2,9 @@
   <v-container>
     <v-data-table
       :headers="headers"
-      :items="listProduct"
+      :items="products"
       class="elevation-1"
+      :loading="loading"
       @click:row="openEditProductPopup"
     >
       <template v-slot:top>
@@ -139,12 +140,13 @@ import {
 } from '@/services/productsApi'
 
 @Component({
-  layout: 'navigation',
-  middleware: ['fetchProducts']
+  layout: 'navigation'
 })
 export default class EditProduct extends Vue {
     private dialog = false
     private dialogDelete = false
+    private loading: boolean = false
+    private products: Array<ProductType> = []
     private headers = [
       { text: 'Name', value: 'name' },
       { text: 'Cost', value: 'cost' }
@@ -176,8 +178,23 @@ export default class EditProduct extends Vue {
       cost: 0
     }
 
-    get listProduct () {
-      return this.$store.state.products.listProduct
+    public start () {
+      this.loading = true
+    }
+
+    public stop () {
+      this.loading = false
+    }
+
+    public async getProductData () {
+      this.start()
+      const listProduct = await getProducts() || []
+      this.stop()
+      this.products = listProduct
+    }
+
+    async created () {
+      await this.getProductData()
     }
 
     get checkProductEdited () {
@@ -212,7 +229,7 @@ export default class EditProduct extends Vue {
     public async deleteProduct () {
       try {
         await deleteProduct(this.editedProduct.id)
-        await getProducts()
+        await this.getProductData()
         this.$toast.global.my_app_success(
           'product deleted'
         )
@@ -246,7 +263,7 @@ export default class EditProduct extends Vue {
               'product successfully created'
             )
           }
-          await getProducts()
+          await this.getProductData()
         } catch (error) {
           this.$toast.global.my_app_error(
             error

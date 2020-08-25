@@ -12,9 +12,9 @@ const productsCol = () => {
 export const getProducts = async () => {
   const snapshot = await productsCol().get()
   if (snapshot.empty) {
-    window.$nuxt.$toast.global.my_app_info(
-      'No product yet'
-    )
+    window.$nuxt.$toast.global.my_app_info({
+      message: 'No product yet'
+    })
     return
   }
   const listProduct: Array<ProductType> = []
@@ -26,7 +26,7 @@ export const getProducts = async () => {
       cost
     })
   })
-  window.$nuxt.$store.commit('products/setListProduct', listProduct)
+  return listProduct
 }
 
 export const addProduct = async (

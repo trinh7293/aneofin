@@ -5,8 +5,9 @@
         cols="8"
       >
         <v-data-table
+          :loading="loading"
           :headers="headersProductList"
-          :items="listProduct"
+          :items="products"
           @click:row="addProductToCart"
         />
       </v-col>
@@ -35,20 +36,19 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
+import { getProducts } from '@/services/productsApi'
 
 @Component({
-  layout: 'navigation',
-  middleware: ['fetchProducts']
+  layout: 'navigation'
 })
 export default class Order extends Vue {
+  private products: Array<ProductType> = []
+  private loading: boolean = false
+
   private headersProductList = [
     { text: 'Name', value: 'name' },
     { text: 'Cost', value: 'cost' }
   ]
-
-  get listProduct () {
-    return this.$store.state.products.listProduct
-  }
 
   private headersListOrderDetail = [
     { text: 'Name', value: 'name' },
@@ -56,6 +56,25 @@ export default class Order extends Vue {
   ]
 
   private listOrderDetail: Array<OrderDetailType> = []
+
+  public start () {
+    this.loading = true
+  }
+
+  public stop () {
+    this.loading = false
+  }
+
+  public async getProductData () {
+    this.start()
+    const listProduct = await getProducts() || []
+    this.stop()
+    this.products = listProduct
+  }
+
+  async created () {
+    await this.getProductData()
+  }
 
   public addProductToCart (item: ProductType) {
     const checkProduct = this.listOrderDetail.find(
