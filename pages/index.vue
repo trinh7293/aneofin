@@ -1,11 +1,43 @@
 <template>
   <v-container class="grey lighten-5">
+    <!-- <v-card>
+      <v-card-title>
+        Bán hàng
+        <v-spacer />
+        <v-text-field
+          v-model="search"
+          append-icon="mdi-magnify"
+          label="Tìm kiếm"
+          single-line
+          hide-details
+        />
+      </v-card-title>
+    </v-card> -->
+    <v-toolbar
+      flat
+    >
+      <v-toolbar-title>Bán hàng</v-toolbar-title>
+      <v-divider
+        class="mx-4"
+        inset
+        vertical
+      />
+      <v-spacer />
+      <v-text-field
+        v-model="search"
+        append-icon="mdi-magnify"
+        label="Tìm kiếm"
+        single-line
+        hide-details
+      />
+    </v-toolbar>
     <v-row no-gutters>
       <v-col
         cols="8"
       >
         <v-data-table
           :loading="loading"
+          :search="search"
           :headers="headersProductList"
           :items="products"
           @click:row="addProductToCart"
@@ -19,11 +51,34 @@
           hide-default-header
           :headers="headersListOrderDetail"
           :items="listOrderDetail"
-          @click:row="removeOrderDetail"
         >
+          <template v-slot:[`item.actions`]="{ item }">
+            <v-icon
+              color="red"
+              small
+              @click="removeOrderDetail(item)"
+            >
+              mdi-delete
+            </v-icon>
+          </template>
+          <template v-slot:[`item.quantity`]="props">
+            <v-edit-dialog
+              :return-value.sync="props.item.quantity"
+            >
+              {{ props.item.quantity }}
+              <template v-slot:input>
+                <v-text-field
+                  v-model="props.item.quantity"
+                  :rules="quantityRules"
+                  label="Edit"
+                  single-line
+                />
+              </template>
+            </v-edit-dialog>
+          </template>
           <template slot="body.append">
             <tr>
-              <td>Total: {{ totalCost }}</td>
+              <td>Tổng: {{ totalCost }}</td>
               <td />
             </tr>
           </template>
@@ -34,10 +89,11 @@
           :loading="payLoading"
           @click="addPayingTransactionImpl"
         >
-          Pay
+          Thanh toán
         </v-btn>
       </v-col>
     </v-row>
+    </v-toolbar>
   </v-container>
 </template>
 
@@ -46,6 +102,7 @@ import { Vue, Component } from 'vue-property-decorator'
 import _ from 'lodash'
 import { getProducts } from '@/services/productsApi'
 import { addPayingTransaction } from '@/services/oderApi'
+import { quantityRules } from '@/utils/validateRules'
 
 @Component({
   layout: 'navigation'
@@ -54,15 +111,17 @@ export default class Order extends Vue {
   private products: Array<ProductType> = []
   private loading: boolean = false
   private payLoading: boolean = false
-
+  private quantityRules: Array<any> = quantityRules
+  private search: string = ''
   private headersProductList = [
-    { text: 'Name', value: 'name' },
-    { text: 'Cost', value: 'cost' }
+    { text: 'Tên', value: 'name' },
+    { text: 'Giá', value: 'cost' }
   ]
 
   private headersListOrderDetail = [
-    { text: 'Name', value: 'name' },
-    { text: 'Quantity', value: 'quantity' }
+    { text: 'Tên', value: 'name' },
+    { text: 'Số lượng', value: 'quantity' },
+    { text: '', value: 'actions', sortable: false }
   ]
 
   private listOrderDetail: Array<OrderDetailType> = []

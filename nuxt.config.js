@@ -101,12 +101,12 @@ export default {
         name: 'my_app_success',
         message: (payload) => {
           // if there is no message passed show default message
-          if (!payload.message) {
+          if (!payload) {
             return 'Success'
           }
 
           // if there is a message show it with the message
-          return `${payload.message}`
+          return `${payload}`
         },
         options: {
           type: 'success'

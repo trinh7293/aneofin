@@ -57,3 +57,12 @@ export const editProduct = (
 export const deleteProduct = (productId: string) => {
   return productsCol().doc(productId).delete()
 }
+
+export const deleteBatchProduct = async (products: ProductType[]) => {
+  const batch = firestore.batch()
+  products.forEach((pro) => {
+    const proRef = productsCol().doc(pro.id)
+    batch.delete(proRef)
+  })
+  await batch.commit()
+}

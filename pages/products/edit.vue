@@ -1,6 +1,8 @@
 <template>
   <v-container>
     <v-data-table
+      v-model="productSelected"
+      show-select
       :headers="headers"
       :items="products"
       class="elevation-1"
@@ -15,6 +17,15 @@
             inset
             vertical
           />
+          <v-spacer />
+          <v-btn
+            v-if="productSelected.length > 0"
+            color="red"
+            dark
+            @click="deleteBatchProduct"
+          >
+            Xóa sản phẩm đã chọn
+          </v-btn>
           <v-spacer />
           <v-dialog v-model="dialog" max-width="500">
             <template v-slot:activator="{ on }">
@@ -145,7 +156,7 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator'
 import {
-  addProduct, editProduct, deleteProduct, getProducts
+  addProduct, editProduct, deleteProduct, deleteBatchProduct, getProducts
 } from '@/services/productsApi'
 
 @Component({
@@ -156,10 +167,11 @@ export default class EditProduct extends Vue {
     private dialogDelete = false
     private loading: boolean = false
     private products: Array<ProductType> = []
+    private productSelected: Array<ProductType> = []
     private headers = [
-      { text: 'Name', value: 'name' },
-      { text: 'Cost', value: 'cost' },
-      { text: 'Stock', value: 'stock' }
+      { text: 'Tên', value: 'name' },
+      { text: 'Giá', value: 'cost' },
+      { text: 'Số lượng trong kho', value: 'stock' }
     ]
 
     private valid = false
@@ -256,6 +268,18 @@ export default class EditProduct extends Vue {
       }
       this.dialogDelete = false
       this.close()
+    }
+
+    public async deleteBatchProduct () {
+      try {
+        await deleteBatchProduct(this.productSelected)
+        await this.getProductData()
+        this.$toast.global.my_app_success(
+          'selection product deleted'
+        )
+      } catch (error) {
+        this.$toast.global.my_app_error(error)
+      }
     }
 
     public close () {
