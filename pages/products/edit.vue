@@ -261,7 +261,7 @@ export default class EditProduct extends Vue {
         await deleteProduct(this.editedProduct.id)
         await this.getProductData()
         this.$toast.global.my_app_success(
-          'product deleted'
+          { message: 'product deleted' }
         )
       } catch (error) {
         this.$toast.global.my_app_error(error)
@@ -275,7 +275,7 @@ export default class EditProduct extends Vue {
         await deleteBatchProduct(this.productSelected)
         await this.getProductData()
         this.$toast.global.my_app_success(
-          'selection product deleted'
+          { message: 'selection product deleted' }
         )
       } catch (error) {
         this.$toast.global.my_app_error(error)
@@ -297,12 +297,12 @@ export default class EditProduct extends Vue {
           if (this.editedIndex !== '') {
             await editProduct(this.editedProduct)
             this.$toast.global.my_app_success(
-              'product successfully created'
+              { message: 'product successfully edited' }
             )
           } else {
             await addProduct(this.editedProduct)
             this.$toast.global.my_app_success(
-              'product successfully created'
+              { message: 'product successfully created' }
             )
           }
           await this.getProductData()

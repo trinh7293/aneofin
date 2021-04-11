@@ -93,7 +93,6 @@
         </v-btn>
       </v-col>
     </v-row>
-    </v-toolbar>
   </v-container>
 </template>
 
