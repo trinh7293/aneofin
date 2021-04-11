@@ -1,7 +1,9 @@
+import * as firebase from 'firebase/app'
 import {
   USER_COLLECTION,
   ORDER_SUBCOLLECTION,
-  ORDER_DETAIL_SUBCOLLECTION
+  ORDER_DETAIL_SUBCOLLECTION,
+  PRODUCTS_SUBCOLLECTION
 } from '@/constants'
 import { firestore, auth } from '@/services/fireinit'
 // import OrderConverter from '@/services/converters/OrderConverter'
@@ -21,6 +23,11 @@ const orderDetailCol = () => {
     .collection(ORDER_DETAIL_SUBCOLLECTION)
 }
 
+const productsCol = () => {
+  return userDoc()
+    .collection(PRODUCTS_SUBCOLLECTION)
+}
+
 export const getOrders = async () => {
   const snapshot = await ordersCol().get()
   if (snapshot.empty) {
@@ -28,17 +35,18 @@ export const getOrders = async () => {
   }
   const listOrder: Array<ProductType> = []
   snapshot.forEach((doc) => {
-    const { name, cost } = doc.data()
+    const { name, cost, stock } = doc.data()
     listOrder.push({
       id: doc.id,
       name,
-      cost
+      cost,
+      stock
     })
   })
   return listOrder
 }
 
-// add order and orderDetail in batch
+// add order and orderDetail, decrease amount in store of products in batch
 export const addPayingTransaction = async (
   listOrderDetail: Array<OrderDetailType>
 ) => {
@@ -53,6 +61,10 @@ export const addPayingTransaction = async (
       orderId: orderRef.id,
       productId: odDe.productId,
       quantity: odDe.quantity
+    })
+    const productRef = productsCol().doc(odDe.productId)
+    batch.update(productRef, {
+      stock: firebase.firestore.FieldValue.increment(-odDe.quantity)
     })
   })
   await batch.commit()

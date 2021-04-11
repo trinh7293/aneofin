@@ -19,6 +19,7 @@ interface ProductType {
   id: string
   name: string
   cost: number
+  stock: number
 }
 
 interface OrderType {

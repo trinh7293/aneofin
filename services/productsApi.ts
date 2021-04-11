@@ -1,4 +1,4 @@
-import _ from 'lodash'
+// import _ from 'lodash'
 import { PRODUCTS_SUBCOLLECTION, USER_COLLECTION } from '@/constants'
 import { firestore, auth } from '@/services/fireinit'
 import productConverter from '@/services/converters/productConverter'
@@ -19,11 +19,12 @@ export const getProducts = async () => {
   }
   const listProduct: Array<ProductType> = []
   snapshot.forEach((doc) => {
-    const { name, cost } = doc.data()
+    const { name, cost, stock } = doc.data()
     listProduct.push({
       id: doc.id,
       name,
-      cost
+      cost,
+      stock: stock || 0
     })
   })
   return listProduct
@@ -32,22 +33,24 @@ export const getProducts = async () => {
 export const addProduct = async (
   product: ProductType
 ) => {
-  const { name, cost } = product
+  const { name, cost, stock } = product
   await productsCol()
     .withConverter(productConverter).add({
       name,
-      cost: Number(cost)
+      cost: Number(cost),
+      stock: Number(stock) || 0
     })
 }
 
 export const editProduct = (
   product: ProductType
 ) => {
-  const { name, cost } = product
+  const { name, cost, stock } = product
   return productsCol().withConverter(productConverter)
     .doc(product.id).set({
       name,
-      cost: Number(cost)
+      cost: Number(cost),
+      stock: Number(stock) || 0
     })
 }
 

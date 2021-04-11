@@ -64,6 +64,15 @@
                           label="cost"
                         />
                       </v-col>
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-model="editedProduct.stock"
+                          required
+                          prepend-icon="mdi-counter"
+                          :rules="stockRules"
+                          label="stock"
+                        />
+                      </v-col>
                     </v-row>
                   </v-container>
                 </v-card-text>
@@ -149,7 +158,8 @@ export default class EditProduct extends Vue {
     private products: Array<ProductType> = []
     private headers = [
       { text: 'Name', value: 'name' },
-      { text: 'Cost', value: 'cost' }
+      { text: 'Cost', value: 'cost' },
+      { text: 'Stock', value: 'stock' }
     ]
 
     private valid = false
@@ -165,17 +175,25 @@ export default class EditProduct extends Vue {
         'Cost must be greater than 1000 and less than 50000000'
     ]
 
+    private stockRules = [
+      (v: number) => !!v || 'Stock is required',
+      (v: number) => (v && v >= 0 && v < 50000000) ||
+        'Stock must be between 0 and 50000000'
+    ]
+
     private editedIndex = ''
     private editedProduct = {
       id: '',
       name: '',
-      cost: 0
+      cost: 0,
+      stock: 0
     }
 
     private defaultProduct = {
       id: '',
       name: '',
-      cost: 0
+      cost: 0,
+      stock: 0
     }
 
     public start () {

@@ -1,15 +1,19 @@
 class Product {
-    name: string
+  name: string
 
-    cost: number
+  cost: number
 
-    constructor (
-      name: string,
-      cost: number
-    ) {
-      this.name = name
-      this.cost = cost
-    }
+  stock: number
+
+  constructor (
+    name: string,
+    cost: number,
+    stock: number
+  ) {
+    this.name = name
+    this.cost = cost
+    this.stock = stock
+  }
 }
 
 // Firestore data converter
@@ -17,7 +21,8 @@ export default {
   toFirestore (product: ProductType) {
     return {
       name: product.name,
-      cost: product.cost
+      cost: product.cost,
+      stock: product.stock
     }
   },
   fromFirestore (
@@ -25,8 +30,9 @@ export default {
   ) {
     const data = snapshot.data()
     return new Product(
-        data?.name,
-        data?.cost
+      data?.name,
+      data?.cost,
+      data?.stock
     )
   }
 }
