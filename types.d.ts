@@ -25,10 +25,12 @@ interface ProductType {
 interface OrderType {
   id: string
   createdDate: Date
+  totalValue: number
 }
 
 interface OrderDetailType {
   id?: string
+  createdDate?: Date
   name?: string
   cost?: number
   orderId?: string

@@ -61,9 +61,9 @@ export default class Navigation extends Vue {
       path: '/products/edit'
     },
     {
-      title: 'Kho',
+      title: 'Lịch sử',
       icon: 'mdi-chart-bar',
-      path: '/'
+      path: '/orderHistory'
     }
   ]
 

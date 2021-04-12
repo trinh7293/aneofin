@@ -78,7 +78,7 @@
           </template>
           <template slot="body.append">
             <tr>
-              <td>Tổng: {{ totalCost }}</td>
+              <td>Tổng: {{ totalValue }}</td>
               <td />
             </tr>
           </template>
@@ -131,7 +131,9 @@ export default class Order extends Vue {
     }
     try {
       this.payLoading = true
-      const orderId = await addPayingTransaction(this.listOrderDetail)
+      const orderId = await addPayingTransaction(
+        this.listOrderDetail, this.totalValue
+      )
       this.$toast.global.my_app_success({
         message: `Successfully Pay for Order ID ${orderId}`
       })
@@ -186,7 +188,7 @@ export default class Order extends Vue {
     }
   }
 
-  get totalCost () {
+  get totalValue () {
     return _.sumBy(this.listOrderDetail, i => (i.cost || 0) * i.quantity)
   }
 }

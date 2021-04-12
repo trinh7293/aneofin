@@ -3,10 +3,10 @@ import {
   USER_COLLECTION,
   ORDER_SUBCOLLECTION,
   ORDER_DETAIL_SUBCOLLECTION,
-  PRODUCTS_SUBCOLLECTION
+  PRODUCTS_SUBCOLLECTION,
+  ORDER_ID
 } from '@/constants'
 import { firestore, auth } from '@/services/fireinit'
-// import OrderConverter from '@/services/converters/OrderConverter'
 
 const userDoc = () => {
   return firestore.collection(USER_COLLECTION)
@@ -28,39 +28,69 @@ const productsCol = () => {
     .collection(PRODUCTS_SUBCOLLECTION)
 }
 
-export const getOrders = async () => {
-  const snapshot = await ordersCol().get()
+export const getOrders = async (): Promise<OrderType[]> => {
+  const snapshot = await ordersCol()
+    .orderBy('createdDate', 'desc')
+    .get()
   if (snapshot.empty) {
-    return
+    return []
   }
-  const listOrder: Array<ProductType> = []
+  const listOrder: Array<OrderType> = []
   snapshot.forEach((doc) => {
-    const { name, cost, stock } = doc.data()
+    const { createdDate, totalValue } = doc.data()
     listOrder.push({
       id: doc.id,
-      name,
-      cost,
-      stock
+      createdDate: createdDate.toDate(),
+      totalValue
     })
   })
   return listOrder
 }
 
+export const getDetailsFromOrder = async (order: OrderType)
+: Promise<OrderDetailType[]> => {
+  const orderId = order.id
+  const snapshot = await orderDetailCol().where(ORDER_ID, '==', orderId).get()
+  if (snapshot.empty) {
+    return []
+  }
+  const listDetails: OrderDetailType[] = []
+  snapshot.forEach((doc) => {
+    const { name, cost, orderId, productId, quantity } = doc.data()
+    listDetails.push({
+      id: doc.id,
+      name,
+      cost,
+      orderId,
+      productId,
+      quantity
+    })
+  })
+  return listDetails
+}
+
 // add order and orderDetail, decrease amount in store of products in batch
 export const addPayingTransaction = async (
-  listOrderDetail: Array<OrderDetailType>
+  listOrderDetail: Array<OrderDetailType>,
+  totalValue: number
 ) => {
   const batch = firestore.batch()
   const orderRef = ordersCol().doc()
+  const createdDate = new Date()
   batch.set(orderRef, {
-    createdDate: new Date()
+    createdDate,
+    totalValue
   })
   listOrderDetail.forEach((odDe) => {
     const OrDeRef = orderDetailCol().doc()
+    const { productId, quantity, name, cost } = odDe
     batch.set(OrDeRef, {
       orderId: orderRef.id,
-      productId: odDe.productId,
-      quantity: odDe.quantity
+      createdDate,
+      productId,
+      quantity,
+      name,
+      cost
     })
     const productRef = productsCol().doc(odDe.productId)
     batch.update(productRef, {
