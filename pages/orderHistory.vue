@@ -9,6 +9,7 @@
           :items="orders"
           :sort-by.sync="sortBy"
           :sort-desc.sync="sortDesc"
+          single-select
           @click:row="selectOrder"
         >
           <template v-slot:[`item.createdDate`]="{item}">
@@ -60,6 +61,13 @@ export default class OrderHistory extends Vue {
 
   async created () {
     await this.getOrders()
+    await this.selectFirstOrder()
+  }
+
+  public async selectFirstOrder () {
+    if (this.orders.length > 0) {
+      await this.selectOrder(this.orders[0])
+    }
   }
 
   public getTimeFormat = (item: OrderType): string => {
