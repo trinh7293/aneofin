@@ -42,7 +42,7 @@ export default class OrderHistory extends Vue {
   private searchOrder: string = ''
   private searchDetail: string = ''
   private sortBy: string = 'createdDate'
-  private sortDesc: boolean = false
+  private sortDesc: boolean = true
   private headerOrders = [
     { text: 'Thời gian', value: 'createdDate' },
     { text: 'Số tiền', value: 'totalValue' }
