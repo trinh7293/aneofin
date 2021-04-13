@@ -7,6 +7,7 @@ import {
   ORDER_ID
 } from '@/constants'
 import { firestore, auth } from '@/services/fireinit'
+import { getTimeFormat } from '@/utils/dateTimeTransform'
 
 const userDoc = () => {
   return firestore.collection(USER_COLLECTION)
@@ -41,6 +42,7 @@ export const getOrders = async (): Promise<OrderType[]> => {
     listOrder.push({
       id: doc.id,
       createdDate: createdDate.toDate(),
+      createdDateFormat: getTimeFormat(createdDate.toDate()),
       totalValue
     })
   })

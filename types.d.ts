@@ -25,6 +25,7 @@ interface ProductType {
 interface OrderType {
   id: string
   createdDate: Date
+  createdDateFormat?: string
   totalValue: number
 }
 
